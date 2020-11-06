@@ -230,7 +230,8 @@ engine = innodb;
 drop table if exists `salesdb`.`alquiler` ;
 
 create table if not exists `salesdb`.`alquiler` (
-  `idalquiler` int not null,
+  `idalquiler` int not null auto_increment,
+  `codalquiler` varchar(45) not null,
   `codlibfis` varchar(45) null,
   `idcliente` int null,
   `idsuscripcion` int null,
@@ -238,7 +239,7 @@ create table if not exists `salesdb`.`alquiler` (
   `total` decimal(10,2) null,
   `fecha_entrega` datetime null,
   `estado` char(1) null,
-  `iddelivery` int not null,
+  `iddelivery` int null,
   `direccion_entrega` varchar(45) null,
   `referencia` varchar(45) null,
   primary key (`idalquiler`),
@@ -258,11 +259,6 @@ create table if not exists `salesdb`.`alquiler` (
   constraint `fk_suscripcion`
     foreign key (`idsuscripcion`)
     references `salesdb`.`suscripcion` (`idsuscripcion`)
-    on delete no action
-    on update no action,
-  constraint `fk_alq_delivery`
-    foreign key (`idalquiler`)
-    references `salesdb`.`delivery` (`iddelivery`)
     on delete no action
     on update no action)
 engine = innodb;
@@ -299,10 +295,11 @@ engine = innodb;
 drop table if exists `salesdb`.`usuario` ;
 
 create table if not exists `salesdb`.`usuario` (
-  `idusuario` int not null,
+  `idusuario` int not null auto_increment,
   `usuario` varchar(45) not null,
-  `password` varchar(45) not null,
+  `password` varchar(70) not null,
   `idpersona` int not null,
+  `estado` char(1) not null,
   primary key (`idusuario`),
   unique index `idusuario_unique` (`idusuario` asc) visible,
   index `fk_usuario_persona_idx` (`idpersona` asc) visible,
@@ -365,46 +362,19 @@ engine = innodb;
 drop table if exists `salesdb`.`venta` ;
 
 create table if not exists `salesdb`.`venta` (
-  `idventa` int not null auto_increment,
-  `idcliente` int not null,
-  `fecha` datetime null,
-  `total` decimal(10,2) null,
-  `estado` varchar(45) null,
-  `iddelivery` int null,
-  primary key (`idventa`),
-  index `fk_ven_cliente_idx` (`idcliente` asc) visible,
-  index `fk_ven_delivery_idx` (`iddelivery` asc) visible,
-  constraint `fk_ven_cliente`
-    foreign key (`idcliente`)
-    references `salesdb`.`cliente` (`idcliente`)
-    on delete no action
-    on update no action,
-  constraint `fk_ven_delivery`
-    foreign key (`iddelivery`)
-    references `salesdb`.`delivery` (`iddelivery`)
-    on delete no action
-    on update no action)
-engine = innodb;
-
-
--- -----------------------------------------------------
--- table `salesdb`.`det_venta_libro`
--- -----------------------------------------------------
-drop table if exists `salesdb`.`det_venta_libro` ;
-
-create table if not exists `salesdb`.`det_venta_libro` (
-  `idventa` int not null,
+  `idcarrito` int not null,
+  `codventa` varchar(50) not null,
   `codlibfis` varchar(45) not null,
   `estado` char(1) null,
   `subtotal` decimal(10,2) null,
-  index `fk_detv_venta_idx` (`idventa` asc) visible,
-  index `fk_detv_libfis_idx` (`codlibfis` asc) visible,
-  constraint `fk_detv_venta`
-    foreign key (`idventa`)
-    references `salesdb`.`venta` (`idventa`)
+   primary key (`idcarrito`,`codlibfis`,`codventa`),
+  index `fk_detv_venta_idx` (`idcarrito` asc) visible,
+  constraint `fk_venta_carrito`
+    foreign key (`idcarrito`)
+    references `salesdb`.`carrito_tmp` (`idcarrito`)
     on delete no action
     on update no action,
-  constraint `fk_detv_libfis`
+  constraint `fk_venta_libfis`
     foreign key (`codlibfis`)
     references `salesdb`.`libro_fisico` (`codlibfis`)
     on delete no action
@@ -418,7 +388,7 @@ engine = innodb;
 drop table if exists `salesdb`.`perfil` ;
 
 create table if not exists `salesdb`.`perfil` (
-  `idperfil` int not null,
+  `idperfil` int not null auto_increment,
   `descripcion` varchar(45) null,
   `estado` char(1) null,
   primary key (`idperfil`))
